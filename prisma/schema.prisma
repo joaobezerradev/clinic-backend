@@ -1,0 +1,198 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Specialization {
+  CARDIOLOGY
+  DERMATOLOGY
+  GENERAL_PRACTICE
+  NEUROLOGY
+  PEDIATRICS
+  PSYCHIATRY
+  PHYSIOTHERAPY
+  NUTRITION
+}
+
+enum DocumentType {
+  CRM
+  CRN
+  CREFITO
+}
+
+enum Role {
+  PATIENT
+  PROFESSIONAL
+  ADMIN
+}
+
+model User {
+  id             String        @id @default(uuid()) @db.Uuid
+  username       String        @unique @db.VarChar(30)
+  password       String        @db.VarChar(256)
+  role           Role
+  patient        Patient?      @relation(fields: [patientId], references: [id])
+  professional   Professional? @relation(fields: [professionalId], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  patientId      String?       @map("patient_id") @db.Uuid
+  professionalId String?       @map("professional_id") @db.Uuid
+
+  @@map("user")
+}
+
+model Address {
+  id           String   @id @default(uuid()) @db.Uuid
+  street       String   @db.VarChar(100)
+  number       String   @db.VarChar(10)
+  complement   String?  @db.VarChar(100)
+  neighborhood String   @db.VarChar(100)
+  city         String   @db.VarChar(30)
+  state        String   @db.VarChar(30)
+  postalCode   String   @db.VarChar(10)
+  createdAt    DateTime @default(now()) @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @db.Timestamptz()
+
+  patientId String    @map("patient_id") @db.Uuid
+  Patient   Patient[]
+
+  @@map("address")
+}
+
+model Patient {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String        @db.VarChar(30)
+  surname      String        @db.VarChar(30)
+  email        String        @unique @db.VarChar(50)
+  phone        String        @db.VarChar(30)
+  birthdate    DateTime      @db.Date
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  appointments Appointment[]
+  User         User[]
+  Address      Address       @relation(fields: [addressId], references: [id])
+  addressId    String        @db.Uuid
+
+  @@index([email], name: "idx_patient_email")
+  @@map("patient")
+}
+
+model Professional {
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String         @db.VarChar(30)
+  surname        String         @db.VarChar(30)
+  document       String         @db.VarChar(30)
+  documentType   DocumentType   @map("document_type")
+  specialization Specialization
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz()
+  appointments   Appointment[]
+  User           User[]
+
+  @@index([document], name: "idx_professional_document")
+  @@map("professional")
+}
+
+model Place {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(30)
+  street       String   @db.VarChar(100)
+  neighborhood String   @db.VarChar(100)
+  number       String   @db.VarChar(10)
+  complement   String   @db.VarChar(100)
+  state        String   @db.VarChar(30)
+  city         String   @db.VarChar(30)
+  postalCode   String   @db.VarChar(10)
+  rooms        Room[]
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("place")
+}
+
+model Room {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String        @db.VarChar(30)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  Place        Place         @relation(fields: [placeId], references: [id])
+  placeId      String        @map("place_id") @db.Uuid
+
+  @@map("room")
+}
+
+model Appointment {
+  id             String        @id @default(uuid()) @db.Uuid
+  date           DateTime      @db.Timestamptz()
+  patientId      String        @map("patient_id") @db.Uuid
+  professionalId String        @map("professional_id") @db.Uuid
+  roomId         String        @map("room_id") @db.Uuid
+  paymentId      String        @map("payment_id") @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  patient        Patient       @relation(fields: [patientId], references: [id])
+  professional   Professional  @relation(fields: [professionalId], references: [id])
+  room           Room          @relation(fields: [roomId], references: [id])
+  payment        Payment       @relation(fields: [paymentId], references: [id])
+  Examination    Examination[]
+
+  @@index([date], name: "idx_appointment_date")
+  @@index([patientId], name: "idx_appointment_patientId")
+  @@index([professionalId], name: "idx_appointment_professionalId")
+  @@index([roomId], name: "idx_appointment_roomId")
+  @@map("appointment")
+}
+
+enum PaymentStatus {
+  PAID
+  CANCELED
+  PENDING
+  REFUNDED
+}
+
+enum PaymentType {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_SLIP
+  PIX
+}
+
+model Payment {
+  id          String        @id @default(uuid()) @db.Uuid
+  patientId   String        @map("patient_id") @db.Uuid
+  amount      Int
+  date        DateTime      @db.Timestamptz()
+  type        PaymentType   @map("type")
+  status      PaymentStatus @map("status")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  Appointment Appointment[]
+
+  @@map("payment")
+}
+
+enum ExaminationType {
+  BLOOD_TEST
+  X_RAY
+  ULTRASOUND
+  MRI
+  CT_SCAN
+}
+
+model Examination {
+  id            String          @id @default(uuid()) @db.Uuid
+  type          ExaminationType
+  result        String?         @db.VarChar(300)
+  date          DateTime        @db.Timestamptz()
+  appointmentId String          @map("appointment_id") @db.Uuid
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz()
+  appointment   Appointment     @relation(fields: [appointmentId], references: [id])
+
+  @@map("examination")
+}

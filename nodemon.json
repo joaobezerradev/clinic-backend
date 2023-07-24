@@ -1,0 +1,6 @@
+{
+  "verbose": true,
+  "execMap": {
+    "ts": "tsx -r tsconfig-paths/register src/main.ts"
+  }
+}
