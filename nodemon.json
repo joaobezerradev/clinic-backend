@@ -1,6 +1,7 @@
 {
-  "verbose": true,
-  "execMap": {
-    "ts": "tsx -r tsconfig-paths/register src/main.ts"
-  }
+  "watch": [
+    "src"
+  ],
+  "ext": ".ts",
+  "exec": "tsx -r dotenv/config -r tsconfig-paths/register src/main.ts"
 }
