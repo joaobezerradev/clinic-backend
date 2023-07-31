@@ -1,0 +1,25 @@
+name: CI-CD
+on:
+  push:
+    branches: ["master"]
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Autenticando o usúario Docker HUB
+        uses: docker/login-action@v2.0.0
+        with:
+          username: ${{secrets.DOCKERHUB_USER}}
+          password: ${{secrets.DOCKERHUB_PWD}}
+
+      - name: Construindo a imagem e enviando para o Docker HUB
+        uses: docker/build-push-action@v3.0.0
+        with:
+          file: "./src/Dockerfile"
+          context: "./src"
+          push: true
+          tags: |
+            ${{secrets.DOCKERHUB_USER}}/clinic-backend:latest
+            ${{secrets.DOCKERHUB_USER}}/clinic-backend:${{github.run_number}}
