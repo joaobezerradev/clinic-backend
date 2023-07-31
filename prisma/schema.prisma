@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -31,65 +31,65 @@ enum Role {
 }
 
 model User {
-  id             String        @id @default(uuid()) @db.Uuid
-  username       String        @unique @db.VarChar(30)
-  password       String        @db.VarChar(256)
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  username       String        @unique
+  password       String
   role           Role
   patient        Patient?      @relation(fields: [patientId], references: [id])
   professional   Professional? @relation(fields: [professionalId], references: [id])
-  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
-  patientId      String?       @map("patient_id") @db.Uuid
-  professionalId String?       @map("professional_id") @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  patientId      String?       @map("patient_id") @db.ObjectId
+  professionalId String?       @map("professional_id") @db.ObjectId
 
   @@map("user")
 }
 
 model Address {
-  id           String   @id @default(uuid()) @db.Uuid
-  street       String   @db.VarChar(100)
-  number       String   @db.VarChar(10)
-  complement   String?  @db.VarChar(100)
-  neighborhood String   @db.VarChar(100)
-  city         String   @db.VarChar(30)
-  state        String   @db.VarChar(30)
-  postalCode   String   @db.VarChar(10)
-  createdAt    DateTime @default(now()) @db.Timestamptz()
-  updatedAt    DateTime @updatedAt @db.Timestamptz()
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  postalCode   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  patientId String    @map("patient_id") @db.Uuid
+  patientId String    @map("patient_id") @db.ObjectId
   Patient   Patient[]
 
   @@map("address")
 }
 
 model Patient {
-  id           String        @id @default(uuid()) @db.Uuid
-  name         String        @db.VarChar(30)
-  surname      String        @db.VarChar(30)
-  email        String        @unique @db.VarChar(50)
-  phone        String        @db.VarChar(30)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  surname      String
+  email        String
+  phone        String
   birthdate    DateTime      @db.Date
-  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   appointments Appointment[]
   User         User[]
   Address      Address       @relation(fields: [addressId], references: [id])
-  addressId    String        @db.Uuid
+  addressId    String        @db.ObjectId
 
   @@index([email], name: "idx_patient_email")
   @@map("patient")
 }
 
 model Professional {
-  id             String         @id @default(uuid()) @db.Uuid
-  name           String         @db.VarChar(30)
-  surname        String         @db.VarChar(30)
-  document       String         @db.VarChar(30)
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  surname        String
+  document       String
   documentType   DocumentType   @map("document_type")
   specialization Specialization
-  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
   appointments   Appointment[]
   User           User[]
 
@@ -98,43 +98,43 @@ model Professional {
 }
 
 model Place {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String   @db.VarChar(30)
-  street       String   @db.VarChar(100)
-  neighborhood String   @db.VarChar(100)
-  number       String   @db.VarChar(10)
-  complement   String   @db.VarChar(100)
-  state        String   @db.VarChar(30)
-  city         String   @db.VarChar(30)
-  postalCode   String   @db.VarChar(10)
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  street       String
+  neighborhood String
+  number       String
+  complement   String
+  state        String
+  city         String
+  postalCode   String
   rooms        Room[]
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("place")
 }
 
 model Room {
-  id           String        @id @default(uuid()) @db.Uuid
-  name         String        @db.VarChar(30)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
   appointments Appointment[]
-  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   Place        Place         @relation(fields: [placeId], references: [id])
-  placeId      String        @map("place_id") @db.Uuid
+  placeId      String        @map("place_id") @db.ObjectId
 
   @@map("room")
 }
 
 model Appointment {
-  id             String        @id @default(uuid()) @db.Uuid
-  date           DateTime      @db.Timestamptz()
-  patientId      String        @map("patient_id") @db.Uuid
-  professionalId String        @map("professional_id") @db.Uuid
-  roomId         String        @map("room_id") @db.Uuid
-  paymentId      String        @map("payment_id") @db.Uuid
-  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  date           DateTime
+  patientId      String        @map("patient_id") @db.ObjectId
+  professionalId String        @map("professional_id") @db.ObjectId
+  roomId         String        @map("room_id") @db.ObjectId
+  paymentId      String        @map("payment_id") @db.ObjectId
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
   patient        Patient       @relation(fields: [patientId], references: [id])
   professional   Professional  @relation(fields: [professionalId], references: [id])
   room           Room          @relation(fields: [roomId], references: [id])
@@ -163,14 +163,14 @@ enum PaymentType {
 }
 
 model Payment {
-  id          String        @id @default(uuid()) @db.Uuid
-  patientId   String        @map("patient_id") @db.Uuid
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  patientId   String        @map("patient_id")
   amount      Int
-  date        DateTime      @db.Timestamptz()
+  date        DateTime
   type        PaymentType   @map("type")
   status      PaymentStatus @map("status")
-  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
   Appointment Appointment[]
 
   @@map("payment")
@@ -185,13 +185,13 @@ enum ExaminationType {
 }
 
 model Examination {
-  id            String          @id @default(uuid()) @db.Uuid
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
   type          ExaminationType
-  result        String?         @db.VarChar(300)
-  date          DateTime        @db.Timestamptz()
-  appointmentId String          @map("appointment_id") @db.Uuid
-  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz()
+  result        String?
+  date          DateTime
+  appointmentId String          @map("appointment_id") @db.ObjectId
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
   appointment   Appointment     @relation(fields: [appointmentId], references: [id])
 
   @@map("examination")

@@ -11,7 +11,7 @@ export class HttpModule implements Module {
       app.use(cors())
       app.use(express.json())
       app.use(router)
-      app.listen(environment.HTTP_PORT)
+      app.listen(environment.http.port)
       console.log('HTTP MODULE: init successful')
     } catch (error) {
       console.error('HTTP MODULE: init fail', error)

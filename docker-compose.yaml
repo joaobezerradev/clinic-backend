@@ -1,15 +1,11 @@
 version: "3"
 
 services:
-  database:
-    container_name: database
-    image: bitnami/postgresql:16
+  mongodb:
+    container_name: mongodb
+    image: bitnami/mongodb:latest
     restart: always
     environment:
-      - POSTGRESQL_USERNAME=${DB_USER}
-      - POSTGRESQL_PASSWORD=${DB_PASS}
-      - POSTGRESQL_DATABASE=${DB_NAME}
+      - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - ${DB_PORT}:5432
-    volumes:
-      - .docker/database/pg:/bitnami/postgresql
+      - ${DB_PORT}:27017
