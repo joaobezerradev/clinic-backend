@@ -17,8 +17,8 @@ jobs:
       - name: Construindo a imagem e enviando para o Docker HUB
         uses: docker/build-push-action@v3.0.0
         with:
-          file: "./src/Dockerfile"
-          context: "./src"
+          file: "./Dockerfile"
+          context: "."
           push: true
           tags: |
             ${{secrets.DOCKERHUB_USER}}/clinic-backend:latest
