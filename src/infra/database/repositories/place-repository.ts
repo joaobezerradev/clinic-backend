@@ -5,7 +5,7 @@ export class PlaceRepository {
   }
 
   async findAll (): Promise<any> {
-    return await this.prisma.place.findMany()
+    return this.prisma.place.findMany()
   }
 
   async save (params: {

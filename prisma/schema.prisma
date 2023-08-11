@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,192 +7,195 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Specialization {
-  CARDIOLOGY
-  DERMATOLOGY
-  GENERAL_PRACTICE
-  NEUROLOGY
-  PEDIATRICS
-  PSYCHIATRY
-  PHYSIOTHERAPY
-  NUTRITION
-}
-
-enum DocumentType {
-  CRM
-  CRN
-  CREFITO
-}
-
-enum Role {
-  PATIENT
-  PROFESSIONAL
-  ADMIN
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
 }
 
 model User {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  username       String        @unique
-  password       String
-  role           Role
-  patient        Patient?      @relation(fields: [patientId], references: [id])
-  professional   Professional? @relation(fields: [professionalId], references: [id])
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  patientId      String?       @map("patient_id") @db.ObjectId
-  professionalId String?       @map("professional_id") @db.ObjectId
-
-  @@map("user")
+  id           String         @id @default(uuid())
+  username     String         @unique
+  password     String
+  role_id      String
+  role         Role           @relation(fields: [role_id], references: [id])
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  Patient      Patient[]
+  Professional Professional[]
 }
 
 model Address {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String    @id @default(uuid())
   street       String
   number       String
   complement   String?
   neighborhood String
   city         String
   state        String
-  postalCode   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  patientId String    @map("patient_id") @db.ObjectId
-  Patient   Patient[]
-
-  @@map("address")
+  postal_code  String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  patient_id   String
+  Patient      Patient[]
 }
 
 model Patient {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  id           String        @id @default(uuid())
   name         String
-  surname      String
-  email        String
+  email        String        @unique
   phone        String
-  birthdate    DateTime      @db.Date
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  birthdate    DateTime
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  address_id   String
+  address      Address       @relation(fields: [addressId], references: [id])
   appointments Appointment[]
-  User         User[]
-  Address      Address       @relation(fields: [addressId], references: [id])
-  addressId    String        @db.ObjectId
+  user         User?         @relation(fields: [userId], references: [id])
+  userId       String?
+  addressId    String
+}
 
-  @@index([email], name: "idx_patient_email")
-  @@map("patient")
+model Specialization {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  professionals Professional[]
+}
+
+model DocumentType {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  professionals Professional[]
 }
 
 model Professional {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  surname        String
-  document       String
-  documentType   DocumentType   @map("document_type")
-  specialization Specialization
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  appointments   Appointment[]
-  User           User[]
-
-  @@index([document], name: "idx_professional_document")
-  @@map("professional")
+  id                String         @id @default(uuid())
+  name              String
+  surname           String
+  document          String         @unique
+  document_type_id  String
+  document_type     DocumentType   @relation(fields: [document_type_id], references: [id])
+  specialization_id String
+  specialization    Specialization @relation(fields: [specialization_id], references: [id])
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  appointments      Appointment[]
+  user              User?          @relation(fields: [userId], references: [id])
+  userId            String?
 }
 
 model Place {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  street       String
-  neighborhood String
-  number       String
-  complement   String
-  state        String
-  city         String
-  postalCode   String
-  rooms        Room[]
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  @@map("place")
+  id            String         @id @default(uuid())
+  name          String
+  street        String
+  neighborhood  String
+  number        String
+  complement    String?
+  state         String
+  city          String
+  postal_code   String
+  rooms         Room[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  subscriptions Subscription[]
 }
 
 model Room {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  id           String        @id @default(uuid())
   name         String
+  place_id     String
+  place        Place         @relation(fields: [place_id], references: [id])
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
   appointments Appointment[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  Place        Place         @relation(fields: [placeId], references: [id])
-  placeId      String        @map("place_id") @db.ObjectId
-
-  @@map("room")
 }
 
 model Appointment {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  date           DateTime
-  patientId      String        @map("patient_id") @db.ObjectId
-  professionalId String        @map("professional_id") @db.ObjectId
-  roomId         String        @map("room_id") @db.ObjectId
-  paymentId      String        @map("payment_id") @db.ObjectId
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  patient        Patient       @relation(fields: [patientId], references: [id])
-  professional   Professional  @relation(fields: [professionalId], references: [id])
-  room           Room          @relation(fields: [roomId], references: [id])
-  payment        Payment       @relation(fields: [paymentId], references: [id])
-  Examination    Examination[]
-
-  @@index([date], name: "idx_appointment_date")
-  @@index([patientId], name: "idx_appointment_patientId")
-  @@index([professionalId], name: "idx_appointment_professionalId")
-  @@index([roomId], name: "idx_appointment_roomId")
-  @@map("appointment")
+  id              String        @id @default(uuid())
+  date            DateTime
+  patient_id      String
+  patient         Patient       @relation(fields: [patient_id], references: [id])
+  professional_id String
+  professional    Professional  @relation(fields: [professional_id], references: [id])
+  room_id         String
+  room            Room          @relation(fields: [room_id], references: [id])
+  payment_id      String
+  payment         Payment       @relation(fields: [payment_id], references: [id])
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  examinations    Examination[]
 }
 
-enum PaymentStatus {
-  PAID
-  CANCELED
-  PENDING
-  REFUNDED
+model PaymentStatus {
+  id       String    @id @default(uuid())
+  status   String    @unique
+  payments Payment[]
 }
 
-enum PaymentType {
-  CREDIT_CARD
-  DEBIT_CARD
-  BANK_SLIP
-  PIX
+model PaymentType {
+  id       String    @id @default(uuid())
+  type     String    @unique
+  payments Payment[]
+}
+
+model Coupon {
+  id         String    @id @default(uuid())
+  code       String    @unique
+  amount_off Int
+  payments   Payment[]
 }
 
 model Payment {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  patientId   String        @map("patient_id")
-  amount      Int
-  date        DateTime
-  type        PaymentType   @map("type")
-  status      PaymentStatus @map("status")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  Appointment Appointment[]
-
-  @@map("payment")
+  id                String         @id @default(uuid())
+  amount            Int
+  date              DateTime
+  payment_type_id   String
+  payment_type      PaymentType    @relation(fields: [payment_type_id], references: [id])
+  payment_status_id String
+  payment_status    PaymentStatus  @relation(fields: [payment_status_id], references: [id])
+  coupon_id         String?
+  coupon            Coupon?        @relation(fields: [coupon_id], references: [id])
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  appointments      Appointment[]
+  subscriptions     Subscription[]
 }
 
-enum ExaminationType {
-  BLOOD_TEST
-  X_RAY
-  ULTRASOUND
-  MRI
-  CT_SCAN
+model ExaminationType {
+  id           String        @id @default(uuid())
+  type         String        @unique
+  examinations Examination[]
 }
 
 model Examination {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  type          ExaminationType
-  result        String?
-  date          DateTime
-  appointmentId String          @map("appointment_id") @db.ObjectId
-  createdAt     DateTime        @default(now()) @map("created_at")
-  updatedAt     DateTime        @updatedAt @map("updated_at")
-  appointment   Appointment     @relation(fields: [appointmentId], references: [id])
+  id                  String          @id @default(uuid())
+  examination_type_id String
+  examination_type    ExaminationType @relation(fields: [examination_type_id], references: [id])
+  result              String?
+  date                DateTime
+  appointment_id      String
+  appointment         Appointment     @relation(fields: [appointment_id], references: [id])
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+}
 
-  @@map("examination")
+model Plan {
+  id            String         @id @default(uuid())
+  name          String
+  description   String
+  price         Int
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                String   @id @default(uuid())
+  place_id          String
+  place             Place    @relation(fields: [place_id], references: [id])
+  plan_id           String
+  plan              Plan     @relation(fields: [plan_id], references: [id])
+  subscription_date DateTime
+  payment_id        String
+  payment           Payment  @relation(fields: [payment_id], references: [id])
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }

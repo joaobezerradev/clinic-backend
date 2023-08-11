@@ -11,7 +11,9 @@ COPY --from=build /usr/src/app/package-lock.json ./
 COPY --from=build /usr/src/app/package.json ./
 COPY --from=build /usr/src/app/prod-paths.js ./
 COPY --from=build /usr/src/app/tsconfig.json ./
+COPY --from=build /usr/src/app/prisma ./
 RUN npm ci --omit=dev
+RUN npx prisma generate
 
 EXPOSE 80
 EXPOSE 443
