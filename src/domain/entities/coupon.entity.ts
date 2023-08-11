@@ -1,5 +1,5 @@
-import { Entity } from './entity'
-import { ID, Code, Percentage } from '@domain/value-objects'
+import { Entity } from '@domain/entities'
+import { Code, ID, Percentage } from '@domain/value-objects'
 
 export class Coupon extends Entity {
   readonly id: ID

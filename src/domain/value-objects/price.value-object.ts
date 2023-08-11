@@ -1,5 +1,5 @@
 import { CustomError } from '@domain/errors'
-import { type ValueObject } from './value-object'
+import { type ValueObject } from '@domain/value-objects'
 
 type Data = number
 
@@ -17,7 +17,7 @@ export class Price implements ValueObject<Data> {
     }
 
     if (this.data <= 0) {
-      errors.push(new CustomError('Price must be greater than 0', `${prefix}price`))
+      errors.push(new CustomError('Price must be greater than 0', `${prefix}price`, this.data))
     }
 
     return errors

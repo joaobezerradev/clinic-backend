@@ -1,5 +1,5 @@
 import { CustomError } from '@domain/errors'
-import { type ValueObject } from './value-object'
+import { type ValueObject } from '@domain/value-objects'
 
 type Data = string
 

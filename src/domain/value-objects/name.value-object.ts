@@ -1,12 +1,12 @@
 import { CustomError } from '@domain/errors'
-import { type ValueObject } from './value-object'
+import { type ValueObject } from '@domain/value-objects'
 
 type Data = string
 
 export class Name implements ValueObject<Data> {
   constructor (private readonly data: Data) { }
 
-  validate (prefix: string = ''): CustomError[] {
+  validate (prefix = ''): CustomError[] {
     const errors: CustomError[] = []
 
     if (!this.data) {

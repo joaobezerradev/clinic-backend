@@ -1,5 +1,6 @@
-import { Name, ID, Birthdate, Phone, Email, Address } from '@domain/value-objects'
-import { Entity } from './entity'
+import { Address, Birthdate, Email, ID, Name, Phone } from '@domain/value-objects'
+
+import { Entity } from '@domain/entities'
 
 export class Patient extends Entity {
   readonly id: ID

@@ -1,18 +1,6 @@
-import { Place } from '@domain/entities'
+import { Plan } from '@domain/entities'
 
-/* const patient = Patient.create({
-  name: 'Joao',
-  birthdate: '202',
-  email: 'joao@',
-  phone: '81',
-  address: { city: 'city', number: '', street: 'st' }
-})
+const plan = Plan.create({ name: 'A b', price: 0 })
 
-const e = patient.validate()
-console.log(e)
- */
-const place = Place.create({ name: 'OK' })
-place.
-
-const e = place.validate()
+const e = plan.validate()
 console.log(e)

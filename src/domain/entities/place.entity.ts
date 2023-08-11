@@ -1,5 +1,5 @@
-import { Name, ID } from '@domain/value-objects'
-import { Entity } from './entity'
+import { Entity } from '@domain/entities'
+import { ID, Name } from '@domain/value-objects'
 
 type Schedule = {
   id: string

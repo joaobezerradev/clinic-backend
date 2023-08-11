@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { prisma } from '@infra/modules/database'
+import { prisma } from '@infra/modules/'
 import { PlaceRepository } from '@infra/database/repositories'
 import { Router } from 'express'
 
