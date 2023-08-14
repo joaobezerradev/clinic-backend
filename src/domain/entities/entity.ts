@@ -5,7 +5,7 @@ interface Validatable {
   validate: () => CustomError[]
 }
 
-export abstract class Entity {
+export abstract class Entity implements Validatable {
   readonly id: ID
   readonly createdAt: Date
   readonly updatedAt: Date | null
