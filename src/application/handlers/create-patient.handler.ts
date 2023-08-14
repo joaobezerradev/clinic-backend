@@ -1,7 +1,7 @@
+import { type CreatePatientCommand } from '@application/commands'
+import { type Handler } from '@application/interfaces'
 import { Patient } from '@domain/entities'
 import { type PatientRepository } from '@domain/repositories'
-import { type CreatePatientCommand } from 'application/commands'
-import { type Handler } from 'application/interfaces'
 
 export class CreatePatientHandler implements Handler<CreatePatientCommand, void> {
   constructor (private readonly patientRepository: PatientRepository) { }

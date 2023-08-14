@@ -1,4 +1,4 @@
-import { FieldError } from '@domain/errors'
+import { PlaceNotFoundException } from '@domain/exceptions'
 import { type PlaceRepository } from '@domain/repositories'
 import { type CreateSchedulesCommand } from 'application/commands'
 
@@ -7,9 +7,9 @@ export class CreateScheduleHandler {
 
   async handle (command: CreateSchedulesCommand): Promise<void> {
     const place = await this.placeRepository.findByRoomId(command.roomId)
-    if (!place) throw new FieldError('Place not found.', 'roomId', command.roomId)
+    if (!place) throw new PlaceNotFoundException('roomId')
 
-    place.setSchedules(command.schedules)
+    // place.setSchedules(command.schedules)
 
     await this.placeRepository.save(place)
   }

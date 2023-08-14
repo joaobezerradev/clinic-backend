@@ -1,17 +1,15 @@
 import { Entity } from '@domain/entities'
 import { ID, Name } from '@domain/value-objects'
 
-type Schedule = {
-  id: string
-  startTime: Date
-  endTime: Date
-  professionalId: string
-}
-
 type Room = {
   id: string
   name: string
-  schedules: Schedule[]
+  schedules: Array<{
+    id: string
+    startTime: Date
+    endTime: Date
+    professionalId: string
+  }>
 }
 
 export class Place extends Entity {

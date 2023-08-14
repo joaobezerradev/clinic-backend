@@ -3,19 +3,33 @@
     "project": "./tsconfig.json"
   },
   "extends": [
-    "standard-with-typescript",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "standard-with-typescript"
+
   ],
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-misused-promises": "off",
     "sort-imports": [
       "error",
       {
         "ignoreCase": false,
-        "ignoreDeclarationSort": true, // don"t want to sort import lines, use eslint-plugin-import instead
+        "ignoreDeclarationSort": true,
         "ignoreMemberSort": false,
-        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+        "memberSyntaxSortOrder": [
+          "none",
+          "all",
+          "multiple",
+          "single"
+        ],
         "allowSeparatedGroups": true
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "^_"
       }
     ],
     "import/order": [
@@ -25,7 +39,10 @@
           "builtin", // Built-in imports (come from NodeJS native) go first
           "external", // <- External imports
           "internal", // <- Absolute imports
-          ["sibling", "parent"], // <- Relative imports, the sibling and parent types they can be mingled together
+          [
+            "sibling",
+            "parent"
+          ], // <- Relative imports, the sibling and parent types they can be mingled together
           "index", // <- index imports
           "unknown" // <- unknown
         ],

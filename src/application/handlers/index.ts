@@ -1,3 +1,4 @@
+export * from './handler'
 export * from './create-patient.handler'
 export * from './create-place.handler'
 export * from './create-room.handler'

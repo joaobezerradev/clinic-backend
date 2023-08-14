@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "target": "ES6",
+    "target": "ES2020",
     "moduleResolution": "Node",
     "module": "CommonJS",
     "outDir": "./dist",
@@ -9,8 +9,8 @@
       "@domain/*": [
         "domain/*"
       ],
-      "@appplication/*": [
-        "appplication/*"
+      "@application/*": [
+        "application/*"
       ],
       "@infra/*": [
         "infra/*"

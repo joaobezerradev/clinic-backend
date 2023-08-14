@@ -1,8 +1,8 @@
+import { type CreatePlaceCommand } from '@application/commands'
+import { type Handler } from '@application/handlers'
 import { Place } from '@domain/entities'
-import { FieldError } from '@domain/errors'
-import { type CouponRepository, type PlanRepository, type PlaceRepository } from '@domain/repositories'
-import { type CreatePlaceCommand } from 'application/commands'
-import { type Handler } from 'application/interfaces'
+import { PlaceAlreadyExistsException, PlanNotFoundException } from '@domain/exceptions'
+import { type CouponRepository, type PlaceRepository, type PlanRepository } from '@domain/repositories'
 
 export class CreatePlaceHandler implements Handler<CreatePlaceCommand, void> {
   constructor (
@@ -13,18 +13,18 @@ export class CreatePlaceHandler implements Handler<CreatePlaceCommand, void> {
 
   async handle (command: CreatePlaceCommand): Promise<void> {
     const plan = await this.planRepository.findById(command.planId)
-    if (!plan) throw new FieldError('Plan not found.', 'planId', command.planId)
+    if (!plan) throw new PlanNotFoundException('planId')
 
     if (command.couponCode) {
       const foundCoupon = await this.couponRepository.findByCode(command.couponCode)
 
       if (foundCoupon) {
-        foundCoupon.applyTo(plan.state().price)
+        foundCoupon.applyTo(plan.price.value)
       }
     }
 
     const placeAleadyExists = await this.placeRepository.findByName(command.name)
-    if (placeAleadyExists) throw new FieldError('Place already exists.', 'name', command.name)
+    if (placeAleadyExists) throw new PlaceAlreadyExistsException('name')
 
     const place = Place.create(command)
     await this.placeRepository.save(place)
