@@ -2,14 +2,18 @@ import { type CreatePlaceCommand } from '@application/commands'
 import { type Handler } from '@application/handlers'
 import { Place } from '@domain/entities'
 import { PlaceAlreadyExistsException, PlanNotFoundException } from '@domain/exceptions'
-import { type CouponRepository, type PlaceRepository, type PlanRepository } from '@domain/repositories'
+import { type CouponRepository, type FactoryRepository, type PlaceRepository, type PlanRepository } from '@domain/repositories'
 
 export class CreatePlaceHandler implements Handler<CreatePlaceCommand, void> {
-  constructor (
-    private readonly placeRepository: PlaceRepository,
-    private readonly couponRepository: CouponRepository,
-    private readonly planRepository: PlanRepository
-  ) { }
+  private readonly placeRepository: PlaceRepository
+  private readonly couponRepository: CouponRepository
+  private readonly planRepository: PlanRepository
+
+  constructor (factoryRepository: FactoryRepository) {
+    this.placeRepository = factoryRepository.createPlaceRepository()
+    this.couponRepository = factoryRepository.createCouponRepository()
+    this.planRepository = factoryRepository.createPlanRepository()
+  }
 
   async handle (command: CreatePlaceCommand): Promise<void> {
     const plan = await this.planRepository.findById(command.planId)

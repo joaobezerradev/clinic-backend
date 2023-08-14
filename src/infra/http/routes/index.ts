@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Router } from 'express'
 import fs from 'node:fs'
+
+import { Router } from 'express'
 
 export const router = Router()
 

@@ -1,10 +1,14 @@
 import { type CreateRoomCommand } from '@application/commands'
 import { type Handler } from '@application/handlers'
 import { Exception, PlaceNotFoundException } from '@domain/exceptions'
-import { type PlaceRepository } from '@domain/repositories'
+import { type FactoryRepository, type PlaceRepository } from '@domain/repositories'
 
 export class CreateRoomHandler implements Handler<CreateRoomCommand, void> {
-  constructor (private readonly placeRepository: PlaceRepository) { }
+  private readonly placeRepository: PlaceRepository
+
+  constructor (factoryRepository: FactoryRepository) {
+    this.placeRepository = factoryRepository.createPlaceRepository()
+  }
 
   async handle (command: CreateRoomCommand): Promise<void> {
     const place = await this.placeRepository.findById(command.placeId)

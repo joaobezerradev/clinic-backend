@@ -9,15 +9,10 @@ export class LoggerWinston implements Logger {
     this.logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.errors({ stack: true }),
-        winston.format.json()
+        winston.format.json(),
+        winston.format.simple()
       )
     })
-
-    if (process.env.NODE_ENV !== 'production') {
-      this.logger.add(new winston.transports.Console({
-        format: winston.format.simple()
-      }))
-    }
   }
 
   info (message: string): void {

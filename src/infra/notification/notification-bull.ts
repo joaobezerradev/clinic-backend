@@ -66,7 +66,7 @@ export class NotificationBullService implements NotificationService {
       priority: this.getPriorityValue(priority),
       attempts: environment.queue.maxAttempts,
       backoff: {
-        type: 'exponential', // Exponential backoff for retries
+        type: 'exponential',
         delay: 5000 // Start with a delay of 5 seconds
       }
     }
@@ -75,7 +75,7 @@ export class NotificationBullService implements NotificationService {
   private getPriorityValue (priority: PriorityLabel): number {
     const priorityMapping: Record<PriorityLabel, number> = {
       high: 1,
-      normal: Math.floor(2097152 / 2), // Roughly in the middle of the range
+      normal: Math.floor(2097152 / 2),
       low: 2097152
     }
     const value = priorityMapping[priority]

@@ -1,9 +1,13 @@
 import { type CreateSchedulesCommand } from '@application/commands'
 import { Exception, PlaceNotFoundException } from '@domain/exceptions'
-import { type PlaceRepository } from '@domain/repositories'
+import { type FactoryRepository, type PlaceRepository } from '@domain/repositories'
 
 export class CreateScheduleHandler {
-  constructor (private readonly placeRepository: PlaceRepository) { }
+  private readonly placeRepository: PlaceRepository
+
+  constructor (factoryRepository: FactoryRepository) {
+    this.placeRepository = factoryRepository.createPlaceRepository()
+  }
 
   async handle (command: CreateSchedulesCommand): Promise<void> {
     const place = await this.placeRepository.findByRoomId(command.roomId)
