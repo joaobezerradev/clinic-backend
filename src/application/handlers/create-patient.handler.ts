@@ -1,5 +1,5 @@
 import { type CreatePatientCommand } from '@application/commands'
-import { type Handler } from '@application/interfaces'
+import { type Handler } from '@application/handlers'
 import { Patient } from '@domain/entities'
 import { type PatientRepository } from '@domain/repositories'
 

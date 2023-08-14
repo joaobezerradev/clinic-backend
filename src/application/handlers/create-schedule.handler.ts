@@ -1,6 +1,6 @@
-import { PlaceNotFoundException } from '@domain/exceptions'
+import { type CreateSchedulesCommand } from '@application/commands'
+import { Exception, PlaceNotFoundException } from '@domain/exceptions'
 import { type PlaceRepository } from '@domain/repositories'
-import { type CreateSchedulesCommand } from 'application/commands'
 
 export class CreateScheduleHandler {
   constructor (private readonly placeRepository: PlaceRepository) { }
@@ -9,7 +9,11 @@ export class CreateScheduleHandler {
     const place = await this.placeRepository.findByRoomId(command.roomId)
     if (!place) throw new PlaceNotFoundException('roomId')
 
-    // place.setSchedules(command.schedules)
+    for (const schedule of command.schedules) {
+      const [room] = place.rooms
+      const error = room.addSchedule(schedule)
+      if (error) throw new Exception([error])
+    }
 
     await this.placeRepository.save(place)
   }

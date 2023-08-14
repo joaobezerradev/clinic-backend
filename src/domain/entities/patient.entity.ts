@@ -2,7 +2,6 @@ import { Entity } from '@domain/entities'
 import { Address, Birthdate, Email, ID, Name, Phone } from '@domain/value-objects'
 
 export class Patient extends Entity {
-  readonly id: ID
   readonly name: Name
   readonly email: Email
   readonly phone: Phone
@@ -10,7 +9,7 @@ export class Patient extends Entity {
   readonly address: Address
 
   constructor (params: Partial<Patient>) {
-    super()
+    super(params)
     Object.assign(this, params)
   }
 

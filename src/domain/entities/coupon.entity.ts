@@ -2,12 +2,11 @@ import { Entity } from '@domain/entities'
 import { Code, ID, Percentage } from '@domain/value-objects'
 
 export class Coupon extends Entity {
-  readonly id: ID
   readonly code: Code
   readonly percentage: Percentage
 
   constructor (params: Partial<Coupon>) {
-    super()
+    super(params)
     Object.assign(this, params)
   }
 

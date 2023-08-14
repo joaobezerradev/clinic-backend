@@ -1,19 +1,8 @@
-import { Entity } from '@domain/entities'
+import { Entity, Room } from '@domain/entities'
+import { CustomError } from '@domain/errors'
 import { ID, Name } from '@domain/value-objects'
 
-type Room = {
-  id: string
-  name: string
-  schedules: Array<{
-    id: string
-    startTime: Date
-    endTime: Date
-    professionalId: string
-  }>
-}
-
 export class Place extends Entity {
-  readonly id: ID
   readonly name: Name
   readonly rooms: Room[]
 
@@ -24,6 +13,16 @@ export class Place extends Entity {
 
   static create (params: Place.Input): Place {
     return new Place({ id: new ID(), name: new Name(params.name), rooms: [] })
+  }
+
+  addRoom (name: string): CustomError | null {
+    const foundRoom = this.rooms.find(room => room.name.value.toLowerCase() === name.toLowerCase())
+    if (foundRoom) {
+      return new CustomError('Room already exists', 'name', name)
+    }
+
+    this.rooms.push(Room.create({ name }))
+    return null
   }
 }
 

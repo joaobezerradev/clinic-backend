@@ -2,12 +2,11 @@ import { Entity } from '@domain/entities'
 import { ID, Name, Price } from '@domain/value-objects'
 
 export class Plan extends Entity {
-  readonly id: ID
   readonly name: Name
   readonly price: Price
 
   constructor (params: Partial<Plan>) {
-    super()
+    super(params)
     Object.assign(this, params)
   }
 

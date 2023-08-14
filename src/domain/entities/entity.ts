@@ -1,10 +1,25 @@
 import { type CustomError } from '@domain/errors'
+import { type ID } from '@domain/value-objects'
 
 interface Validatable {
   validate: () => CustomError[]
 }
 
 export abstract class Entity {
+  readonly id: ID
+  readonly createdAt: Date
+  readonly updatedAt: Date | null
+  readonly deletedAt: Date | null
+
+  constructor (data?: Partial<Entity>) {
+    if (data) {
+      Object.assign(this, data)
+    }
+    if (!this.createdAt) {
+      this.createdAt = new Date()
+    }
+  }
+
   validate (): CustomError[] {
     const errors: CustomError[] = []
 
