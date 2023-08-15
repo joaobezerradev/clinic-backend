@@ -10,7 +10,7 @@ export class Coupon extends Entity {
     Object.assign(this, params)
   }
 
-  static create (params: Coupon.Input): Coupon {
+  static create (params: Coupon.Create): Coupon {
     return new Coupon({
       id: new ID(),
       code: new Code(params.code),
@@ -24,7 +24,7 @@ export class Coupon extends Entity {
 }
 
 export namespace Coupon {
-  export type Input = {
+  export type Create = {
     code: string
     percentage: number
   }

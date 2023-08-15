@@ -22,5 +22,5 @@ export class Schedule extends Entity {
 }
 
 export namespace Schedule {
-  export type Input = { startAt: Date, endsAt: Date, professionalId: string }
+  export type Create = { startAt: Date, endsAt: Date, professionalId: string }
 }

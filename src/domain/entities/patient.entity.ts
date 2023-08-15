@@ -13,7 +13,7 @@ export class Patient extends Entity {
     Object.assign(this, params)
   }
 
-  static create (params: Patient.Input): Patient {
+  static create (params: Patient.Create): Patient {
     return new Patient({
       id: new ID(),
       name: new Name(params.name),
@@ -26,7 +26,7 @@ export class Patient extends Entity {
 }
 
 export namespace Patient {
-  export type Input = {
+  export type Create = {
     name: string
     email: string
     phone: string

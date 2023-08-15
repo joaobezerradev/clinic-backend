@@ -1,6 +1,6 @@
 import { type CreateRoomCommand } from '@application/commands'
 import { type Handler } from '@application/handlers'
-import { Exception, PlaceNotFoundException } from '@domain/exceptions'
+import { PlaceNotFoundException } from '@domain/exceptions'
 import { type FactoryRepository, type PlaceRepository } from '@domain/repositories'
 
 export class CreateRoomHandler implements Handler<CreateRoomCommand, void> {
@@ -14,8 +14,7 @@ export class CreateRoomHandler implements Handler<CreateRoomCommand, void> {
     const place = await this.placeRepository.findById(command.placeId)
     if (!place) throw new PlaceNotFoundException('placeId')
 
-    const error = place.addRoom(command.name)
-    if (error) throw new Exception([error])
+    place.addRoom(command.name)
 
     await this.placeRepository.save(place)
   }

@@ -10,7 +10,7 @@ export class Plan extends Entity {
     Object.assign(this, params)
   }
 
-  static create (params: Plan.Input): Plan {
+  static create (params: Plan.Create): Plan {
     return new Plan({
       id: new ID(),
       name: new Name(params.name),
@@ -20,5 +20,5 @@ export class Plan extends Entity {
 }
 
 export namespace Plan {
-  export type Input = { name: string, price: number }
+  export type Create = { name: string, price: number }
 }
