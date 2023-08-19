@@ -1,3 +1,5 @@
+import { Exception } from '@domain/exceptions'
+
 import { type HttpServer } from './http'
 import { corsMiddleware } from './lib/middlewares/cors'
 import { type Request } from './lib/request'
@@ -11,6 +13,7 @@ export class NodeHttp implements HttpServer<Request, Response> {
     const server = new NodeHttpServer()
 
     server.use(corsMiddleware())
+    server.useError(Exception)
     this.server = server
   }
 

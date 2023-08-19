@@ -2,18 +2,14 @@ import cluster from 'node:cluster'
 import { type IncomingMessage, type ServerResponse, createServer } from 'node:http'
 import * as os from 'node:os'
 
-import { Exception } from '@domain/exceptions'
-
 import { Request } from './request'
 import { Response } from './response'
 import { type RequestHandler, Router } from './router'
 
-type ErrorHandler = (error: any, req: Request, response: Response) => Promise<void>
-
 export class HttpServer {
   private readonly middlewares: RequestHandler[] = []
   private readonly router: Router = new Router()
-  private readonly errorHandler: ErrorHandler
+  private errorClass?: new (...args: any[]) => Error // Armazena a classe do erro
 
   route (method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', path: string, handler: RequestHandler): void {
     this.router.register(method, path, handler)
@@ -21,6 +17,10 @@ export class HttpServer {
 
   use (middleware: RequestHandler): void {
     this.middlewares.push(middleware)
+  }
+
+  useError (errorClass: new (...args: any[]) => Error): void { // Aceita uma classe de erro
+    this.errorClass = errorClass
   }
 
   async handleRequest (req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -32,8 +32,8 @@ export class HttpServer {
     try {
       await this.router.route(request, response)
     } catch (error) {
-      if (error instanceof Exception) {
-        response.json({ errors: error.errors }, 400)
+      if (this.errorClass && error instanceof this.errorClass) {
+        response.json(error, 400)
         return
       }
       response.internalServerError()
