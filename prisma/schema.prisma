@@ -21,8 +21,8 @@ model User {
   role         Role           @relation(fields: [role_id], references: [id])
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
-  Patient      Patient[]
-  Professional Professional[]
+  patient      Patient[]
+  professional Professional[]
 }
 
 model Address {
@@ -37,7 +37,7 @@ model Address {
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   patient_id   String
-  Patient      Patient[]
+  patient      Patient[]
 }
 
 model Patient {
@@ -49,11 +49,10 @@ model Patient {
   created_at   DateTime      @default(now())
   updated_at   DateTime      @updatedAt
   address_id   String
-  address      Address       @relation(fields: [addressId], references: [id])
+  address      Address       @relation(fields: [address_id], references: [id])
   appointments Appointment[]
-  user         User?         @relation(fields: [userId], references: [id])
-  userId       String?
-  addressId    String
+  user         User?         @relation(fields: [user_id], references: [id])
+  user_id      String?
 }
 
 model Specialization {
@@ -80,8 +79,8 @@ model Professional {
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
   appointments      Appointment[]
-  user              User?          @relation(fields: [userId], references: [id])
-  userId            String?
+  user              User?          @relation(fields: [user_id], references: [id])
+  user_id           String?
 }
 
 model Place {

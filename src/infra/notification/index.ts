@@ -1,1 +1,1 @@
-export * from './notification-bull'
+export * from './notification'

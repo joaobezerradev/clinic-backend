@@ -1,10 +1,13 @@
-import 'module-alias/register'
+import { NodeHttp } from '@infra/http/node-http'
 
-import { Plan } from '@domain/entities'
-import { LoggerWinston } from '@infra/logger'
+const server = new NodeHttp()
 
-const plan = Plan.create({ name: 'A b', price: 0 })
+server.post('/user/:id', async (req, res) => {
+  res.json({ params: req.params, query: req.query, body: req.body, headers: req.headers })
+  // A partir daqui, você poderia, por exemplo, consultar um banco de dados para buscar o usuário com o ID fornecido.
+  // Como é apenas um exemplo, vamos retornar um usuário mock.
+})
 
-const e = plan.validate()
-const l = new LoggerWinston()
-l.info(JSON.stringify(e, undefined, 2))
+server.start(3000, () => {
+  console.log('Server is running on port 3000')
+})
