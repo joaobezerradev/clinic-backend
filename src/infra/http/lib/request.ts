@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { IncomingMessage } from 'node:http'
 
 export class Request extends IncomingMessage {
@@ -16,7 +17,7 @@ export class Request extends IncomingMessage {
   }
 
   private async parseBody (req: IncomingMessage): Promise<void> {
-    if (req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') {
+    if (!['POST', 'PUT', 'PATCH'].includes(req.method!)) {
       return
     }
 

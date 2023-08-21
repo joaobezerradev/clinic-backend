@@ -8,10 +8,16 @@ export class Router {
 
   register (method: string, path: string, requestHandler: RequestHandler): void {
     const paramNames: string[] = []
-    const patternStr = '^' + path.replace(/:([a-zA-Z0-9_]+)/g, (_, paramName) => {
+    let patternStr = '^' + path.replace(/:([a-zA-Z0-9_]+)/g, (_, paramName) => {
       paramNames.push(paramName)
       return '([a-zA-Z0-9_]+)'
-    }) + '$'
+    })
+
+    if (path.endsWith('/*')) {
+      patternStr = patternStr.slice(0, -2) + '(?:/.*)?' // Adiciona uma expressão regular para corresponder a qualquer coisa após a barra, incluindo a própria barra
+    }
+
+    patternStr += '$'
     const pattern = new RegExp(patternStr)
 
     this.routes[`${method.toUpperCase()}|${patternStr}`] = { handler: requestHandler, pattern, paramNames }

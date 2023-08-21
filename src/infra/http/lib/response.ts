@@ -12,6 +12,11 @@ export class Response {
     this.serverResponse.end(JSON.stringify(data))
   }
 
+  send (data: any, statusCode = 200, content?: any): void {
+    this.serverResponse.writeHead(statusCode, content)
+    this.serverResponse.end(data)
+  }
+
   unauthorizedError (): void {
     this.json({ error: 'Unauthorized Error' }, 401)
   }
