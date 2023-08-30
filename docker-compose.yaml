@@ -1,18 +1,6 @@
 version: "3"
 
 services:
-  pg-admin:
-    container_name: pg-admin
-    restart: always
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - 15432:80
-    depends_on:
-      - postgresql
-
   postgresql:
     container_name: postgresql
     image: bitnami/postgresql:latest
@@ -25,22 +13,6 @@ services:
       - .docker/pg:/bitnami/postgresql
     ports:
       - ${PG_PORT}:5432
-
-  mongo-express:
-    container_name: mongo-express
-    image: mongo-express
-    ports:
-      - 127017:8081
-    restart: always
-    depends_on:
-      - mongodb
-    environment:
-     - ME_CONFIG_BASICAUTH_USERNAME=admin
-     - ME_CONFIG_BASICAUTH_PASSWORD=admin
-     - ME_CONFIG_MONGODB_SERVER=mongodb
-     - ME_CONFIG_MONGODB_PORT=${MONGO_PORT}
-     - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_USER}
-     - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_PASS}
 
   mongodb:
     container_name: mongodb
@@ -63,3 +35,26 @@ services:
       - .docker/redis:/bitnami/redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+ 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
