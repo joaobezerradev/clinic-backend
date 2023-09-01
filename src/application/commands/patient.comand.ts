@@ -1,10 +1,32 @@
 export class CreatePatientCommand {
+  constructor (readonly data: CreatePatientCommand.Data) { }
+}
+
+export namespace CreatePatientCommand {
+  export type Data = {
+    name: string
+    email: string
+    phone: string
+    document: string
+    birthdate: string
+    address: {
+      street: string
+      number: string
+      neighborhood: string
+      city: string
+      state: string
+      postalCode: string
+      complement?: string
+    }
+  }
+}
+
+export class UpdatePatientCommand {
   constructor (
-    readonly name: string,
-    readonly email: string,
-    readonly phone: string,
-    readonly birthdate: string,
-    readonly address: {
+    readonly id: string,
+    readonly name?: string,
+    readonly phone?: string,
+    readonly address?: Partial<{
       street: string
       number: string
       complement: string
@@ -12,6 +34,10 @@ export class CreatePatientCommand {
       city: string
       state: string
       postalCode: string
-    }
-  ) { }
+    }>
+  ) {}
+}
+
+export class DeletePatientCommand {
+  constructor (readonly id: string) {}
 }

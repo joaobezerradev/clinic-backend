@@ -1,0 +1,5 @@
+export * from './role.enum'
+export * from './specialty.enum'
+export * from './professional-type.enum'
+export * from './appointment-status.enum'
+export * from './room-status.enum'

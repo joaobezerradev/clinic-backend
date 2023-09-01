@@ -1,200 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+enum Role {
+  ADMIN
+  PATIENT
+  DOCTOR
 }
 
-model Role {
-  id    String @id @default(uuid())
-  name  String @unique
-  users User[]
+model Account {
+  id       String @id @db.Uuid
+  email    String @unique
+  password String
+  role     Role
+
+  Patient      Patient[]
+  Professional Professional[]
+
+  createdAt DateTime
+  updatedAt DateTime?
+
+  deletedAt DateTime?
 }
 
-model User {
-  id           String         @id @default(uuid())
-  username     String         @unique
-  password     String
-  role_id      String
-  role         Role           @relation(fields: [role_id], references: [id])
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
-  patient      Patient[]
-  professional Professional[]
-}
-
-model Address {
-  id           String    @id @default(uuid())
+model Patient {
+  id           String  @id @db.Uuid
+  name         String
+  accountId    String  @unique @db.Uuid
+  document     String  @unique
+  phone        String
   street       String
   number       String
   complement   String?
   neighborhood String
   city         String
   state        String
-  postal_code  String
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
-  patient_id   String
-  patient      Patient[]
-}
+  postalCode   String
+  birthdate    String
 
-model Patient {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  phone        String
-  birthdate    DateTime
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
-  address_id   String
-  address      Address       @relation(fields: [address_id], references: [id])
+  account      Account       @relation(fields: [accountId], references: [id])
   appointments Appointment[]
-  user         User?         @relation(fields: [user_id], references: [id])
-  user_id      String?
+
+  createdAt DateTime
+  updatedAt DateTime?
+  deletedAt DateTime?
 }
 
-model Specialization {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  professionals Professional[]
+enum Specialty {
+  CARDIOLOGY
+  DERMATOLOGY
+  ENDOCRINOLOGY
+  GASTROENTEROLOGY
+  GENERAL_PRACTICE
+  NEUROLOGY
+  ONCOLOGY
+  OPHTHALMOLOGY
+  ORTHOPEDICS
+  PEDIATRICS
+  PSYCHIATRY
+  RADIOLOGY
+  SURGERY
+  UROLOGY
 }
 
-model DocumentType {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  professionals Professional[]
+enum ProfessionalType {
+  DOCTOR
+  PHYSIOTHERAPIST
+  NUTRITIONIST
 }
 
 model Professional {
-  id                String         @id @default(uuid())
-  name              String
-  surname           String
-  document          String         @unique
-  document_type_id  String
-  document_type     DocumentType   @relation(fields: [document_type_id], references: [id])
-  specialization_id String
-  specialization    Specialization @relation(fields: [specialization_id], references: [id])
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
-  appointments      Appointment[]
-  user              User?          @relation(fields: [user_id], references: [id])
-  user_id           String?
+  id               String           @id @db.Uuid
+  accountId        String           @unique @db.Uuid
+  specialty        Specialty
+  professionalType ProfessionalType
+  availability     Boolean          @default(true)
+  account          Account          @relation(fields: [accountId], references: [id])
+  appointments     Appointment[]
+
+  createdAt DateTime
+  updatedAt DateTime?
+
+  deletedAt DateTime?
 }
 
-model Place {
-  id            String         @id @default(uuid())
-  name          String
-  street        String
-  neighborhood  String
-  number        String
-  complement    String?
-  state         String
-  city          String
-  postal_code   String
-  rooms         Room[]
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  subscriptions Subscription[]
-}
-
-model Room {
-  id           String        @id @default(uuid())
-  name         String
-  place_id     String
-  place        Place         @relation(fields: [place_id], references: [id])
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
-  appointments Appointment[]
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
 }
 
 model Appointment {
-  id              String        @id @default(uuid())
-  date            DateTime
-  patient_id      String
-  patient         Patient       @relation(fields: [patient_id], references: [id])
-  professional_id String
-  professional    Professional  @relation(fields: [professional_id], references: [id])
-  room_id         String
-  room            Room          @relation(fields: [room_id], references: [id])
-  payment_id      String
-  payment         Payment       @relation(fields: [payment_id], references: [id])
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  examinations    Examination[]
+  id             String            @id @db.Uuid
+  date           DateTime
+  status         AppointmentStatus
+  patientId      String            @db.Uuid
+  professionalId String            @db.Uuid
+  patient        Patient           @relation(fields: [patientId], references: [id])
+  professional   Professional      @relation(fields: [professionalId], references: [id])
+  room           Room              @relation(fields: [roomId], references: [id])
+  roomId         String            @db.Uuid
+
+  createdAt DateTime
+  updatedAt DateTime?
+
+  deletedAt DateTime?
+
+  @@unique([date, patientId, professionalId, roomId])
 }
 
-model PaymentStatus {
-  id       String    @id @default(uuid())
-  status   String    @unique
-  payments Payment[]
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
 }
 
-model PaymentType {
-  id       String    @id @default(uuid())
-  type     String    @unique
-  payments Payment[]
+model Room {
+  id           String        @id @db.Uuid
+  name         String        @unique
+  status       RoomStatus
+  description  String?
+  placeId      String        @db.Uuid
+  place        Place         @relation(fields: [placeId], references: [id])
+  appointments Appointment[]
+
+  createdAt DateTime
+  updatedAt DateTime?
+
+  deletedAt DateTime?
 }
 
-model Coupon {
-  id         String    @id @default(uuid())
-  code       String    @unique
-  amount_off Int
-  payments   Payment[]
-}
+model Place {
+  id    String @id @db.Uuid
+  name  String
+  code  String @unique
+  rooms Room[]
 
-model Payment {
-  id                String         @id @default(uuid())
-  amount            Int
-  date              DateTime
-  payment_type_id   String
-  payment_type      PaymentType    @relation(fields: [payment_type_id], references: [id])
-  payment_status_id String
-  payment_status    PaymentStatus  @relation(fields: [payment_status_id], references: [id])
-  coupon_id         String?
-  coupon            Coupon?        @relation(fields: [coupon_id], references: [id])
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
-  appointments      Appointment[]
-  subscriptions     Subscription[]
-}
+  createdAt DateTime
+  updatedAt DateTime?
 
-model ExaminationType {
-  id           String        @id @default(uuid())
-  type         String        @unique
-  examinations Examination[]
-}
-
-model Examination {
-  id                  String          @id @default(uuid())
-  examination_type_id String
-  examination_type    ExaminationType @relation(fields: [examination_type_id], references: [id])
-  result              String?
-  date                DateTime
-  appointment_id      String
-  appointment         Appointment     @relation(fields: [appointment_id], references: [id])
-  created_at          DateTime        @default(now())
-  updated_at          DateTime        @updatedAt
-}
-
-model Plan {
-  id            String         @id @default(uuid())
-  name          String
-  description   String
-  price         Int
-  subscriptions Subscription[]
-}
-
-model Subscription {
-  id                String   @id @default(uuid())
-  place_id          String
-  place             Place    @relation(fields: [place_id], references: [id])
-  plan_id           String
-  plan              Plan     @relation(fields: [plan_id], references: [id])
-  subscription_date DateTime
-  payment_id        String
-  payment           Payment  @relation(fields: [payment_id], references: [id])
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  deletedAt DateTime?
 }

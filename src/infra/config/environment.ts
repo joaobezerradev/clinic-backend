@@ -8,7 +8,7 @@ interface Environment {
     port: number
   }
   queue: {
-    maxAttempts: number
+  //  maxAttempts: number
   }
 }
 
@@ -20,6 +20,6 @@ export const environment: Environment = {
     port: env.get('HTTP_PORT').required().asInt()
   },
   queue: {
-    maxAttempts: env.get('QUEUE_MAX_ATTEMPTS').required().asInt()
+    // maxAttempts: env.get('QUEUE_MAX_ATTEMPTS').required().asInt()
   }
 }

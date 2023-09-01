@@ -2,20 +2,17 @@ import { type CreatePatientCommand } from '@application/commands'
 import { type Handler } from '@application/handlers'
 import { Patient } from '@domain/entities'
 import { PatientAlreadyExistsException } from '@domain/exceptions'
-import { type FactoryRepository, type PatientRepository } from '@domain/repositories'
+import { type PatientRepository } from '@domain/repositories'
 
 export class CreatePatientHandler implements Handler<CreatePatientCommand, void> {
-  private readonly patientRepository: PatientRepository
-
-  constructor (factoryRepository: FactoryRepository) {
-    this.patientRepository = factoryRepository.createPatientRepository()
+  constructor (private readonly patientRepository: PatientRepository) {
   }
 
   async handle (command: CreatePatientCommand): Promise<void> {
-    const foundEmail = await this.patientRepository.findByEmail(command.email)
-    if (foundEmail) throw new PatientAlreadyExistsException('email')
+    const foundEmail = await this.patientRepository.findByEmail(command.data.email)
+    if (foundEmail) throw new PatientAlreadyExistsException('email', command.data.email)
 
-    const patient = Patient.create(command)
+    const patient = Patient.create(command.data)
     await this.patientRepository.save(patient)
   }
 }
