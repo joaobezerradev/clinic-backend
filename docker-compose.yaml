@@ -1,6 +1,21 @@
 version: "3"
 
 services:
+  api:
+    container_name: api
+    build: .
+    tty: true
+    depends_on:
+      - postgresql
+      - mongodb
+      - kafka
+      - redis
+    ports:
+      - ${HTTP_PORT}:80
+      - 9229:9229
+    volumes:
+      - .:/home/node/app
+
   postgresql:
     container_name: postgresql
     image: bitnami/postgresql:latest
@@ -9,8 +24,6 @@ services:
       - POSTGRESQL_USERNAME=${PG_USER}
       - POSTGRESQL_PASSWORD=${PG_PASS}
       - POSTGRESQL_DATABASE=${PG_NAME}
-    volumes:
-      - .docker/pg:/bitnami/postgresql
     ports:
       - ${PG_PORT}:5432
 
@@ -18,8 +31,6 @@ services:
     container_name: mongodb
     image: bitnami/mongodb:latest
     restart: always
-    volumes:
-      - .docker/mongo:/bitnami/mongodb
     environment:
       - MONGODB_ROOT_USER=${MONGO_USER}
       - MONGODB_ROOT_PASSWORD=${MONGO_PASS}
@@ -31,8 +42,6 @@ services:
     container_name: redis
     image: bitnami/redis:latest
     restart: always
-    volumes:
-      - .docker/redis:/bitnami/redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
 
@@ -58,3 +67,22 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    ports:
+      - "3200:3000"
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+
+volumes:
+  grafana-storage:

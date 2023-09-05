@@ -1,4 +1,4 @@
-import { Exception } from '@domain/exceptions'
+import { Exception, Type } from '@domain/exceptions'
 import { environment } from '@infra/config/environment'
 import { Blaze, type Request, type Response } from 'blaze-http'
 import { corsMiddleware } from 'blaze-http/dist/middlewares'
@@ -15,7 +15,13 @@ export class HttpServerAdapter implements HttpServer<Request, Response> {
     server.useMiddleware(corsMiddleware())
     server.useError((error, _req, res) => {
       if (error instanceof Exception) {
-        res.json(error, 400)
+        const statusCode = {
+          [Type.VALIDATION]: 412,
+          [Type.NOT_FOUND]: 404,
+          [Type.UNPROCESSABLE]: 422
+        } ?? 400
+
+        res.json(error, statusCode[error.type])
       }
     })
     server.enableSwagger({

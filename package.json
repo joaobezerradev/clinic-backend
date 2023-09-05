@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node .",
+    "start": "node -r dotenv/config .",
     "start:dev": "nodemon",
     "build": "rimraf dist && tsup src"
   },
@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.2",
     "@types/module-alias": "^2.0.2",
     "@types/node": "^20.4.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -34,15 +33,13 @@
   "dependencies": {
     "@brazilian-utils/brazilian-utils": "^1.0.0-rc.12",
     "@prisma/client": "^5.0.0",
-    "blaze-http": "^0.0.18",
+    "axios": "^1.5.0",
+    "blaze-http": "^0.0.19",
+    "cep-promise": "^4.4.0",
     "dotenv": "^16.3.1",
     "env-var": "^7.3.1",
-    "ioredis": "^5.3.2",
-    "jsonwebtoken": "^9.0.1",
     "module-alias": "^2.2.3",
-    "mongoose": "^7.3.4",
-    "tsconfig-paths": "^4.2.0",
-    "winston": "^3.10.0"
+    "tsconfig-paths": "^4.2.0"
   },
   "_moduleAliases": {
     "@domain": "dist/domain",

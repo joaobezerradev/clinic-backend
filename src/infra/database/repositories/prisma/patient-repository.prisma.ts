@@ -1,10 +1,17 @@
 import { Patient } from '@domain/entities'
 import { type PatientRepository } from '@domain/repositories'
 import { Address, Birthdate, Email, ID, Name, Phone } from '@domain/value-objects'
+import { type Connection } from '@infra/database/connection'
 import { type PrismaClient } from '@prisma/client'
 
 export class PatientRepositoryPrisma implements PatientRepository {
-  constructor (private readonly prisma: PrismaClient) { }
+  constructor (private readonly connection: Connection<PrismaClient>) { }
+
+  async query (sql: string, params?: any[]): Promise<any[]> {
+    if (params?.length) return this.connection.getConnection().$queryRawUnsafe(sql, ...params)
+
+    return this.connection.getConnection().$queryRawUnsafe(sql)
+  }
 
   private parse (patient: any): Patient {
     return new Patient({
@@ -29,7 +36,7 @@ export class PatientRepositoryPrisma implements PatientRepository {
   }
 
   async findByDocument (document: string): Promise<Patient | null> {
-    const patient = await this.prisma.patient.findUnique({ where: { document }, include: { account: true } })
+    const patient = await this.connection.getConnection().patient.findUnique({ where: { document }, include: { account: true } })
 
     if (!patient) return null
 
@@ -37,15 +44,14 @@ export class PatientRepositoryPrisma implements PatientRepository {
   }
 
   async findByEmail (email: string): Promise<Patient | null> {
-    const patient = await this.prisma.patient.findFirst({ where: { account: { email } }, include: { account: true } })
-
+    await this.connection.getConnection().$connect()
+    const patient = await this.connection.getConnection().patient.findFirst({ where: { account: { email } }, include: { account: true } })
     if (!patient) return null
-
     return this.parse(patient)
   }
 
   async save (patient: Patient): Promise<void> {
-    await this.prisma.patient.upsert({
+    await this.connection.getConnection().patient.upsert({
       create: {
         id: new ID().value,
         birthdate: patient.birthdate.value,

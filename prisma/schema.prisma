@@ -26,12 +26,14 @@ model Account {
   updatedAt DateTime?
 
   deletedAt DateTime?
+
+  @@map("account")
 }
 
 model Patient {
   id           String  @id @db.Uuid
   name         String
-  accountId    String  @unique @db.Uuid
+  accountId    String  @unique @map("account_id") @db.Uuid
   document     String  @unique
   phone        String
   street       String
@@ -46,9 +48,11 @@ model Patient {
   account      Account       @relation(fields: [accountId], references: [id])
   appointments Appointment[]
 
-  createdAt DateTime
-  updatedAt DateTime?
-  deletedAt DateTime?
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("patient")
 }
 
 enum Specialty {
@@ -76,17 +80,18 @@ enum ProfessionalType {
 
 model Professional {
   id               String           @id @db.Uuid
-  accountId        String           @unique @db.Uuid
+  accountId        String           @unique @map("account_id") @db.Uuid
   specialty        Specialty
-  professionalType ProfessionalType
+  professionalType ProfessionalType @map("professional_type")
   availability     Boolean          @default(true)
   account          Account          @relation(fields: [accountId], references: [id])
   appointments     Appointment[]
 
-  createdAt DateTime
-  updatedAt DateTime?
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  deletedAt DateTime?
+  @@map("professional")
 }
 
 enum AppointmentStatus {
@@ -99,19 +104,19 @@ model Appointment {
   id             String            @id @db.Uuid
   date           DateTime
   status         AppointmentStatus
-  patientId      String            @db.Uuid
-  professionalId String            @db.Uuid
+  patientId      String            @map("patient_id") @db.Uuid
+  professionalId String            @map("professional_id") @db.Uuid
   patient        Patient           @relation(fields: [patientId], references: [id])
   professional   Professional      @relation(fields: [professionalId], references: [id])
   room           Room              @relation(fields: [roomId], references: [id])
-  roomId         String            @db.Uuid
+  roomId         String            @map("room_id") @db.Uuid
 
-  createdAt DateTime
-  updatedAt DateTime?
-
-  deletedAt DateTime?
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@unique([date, patientId, professionalId, roomId])
+  @@map("appointment")
 }
 
 enum RoomStatus {
@@ -125,14 +130,15 @@ model Room {
   name         String        @unique
   status       RoomStatus
   description  String?
-  placeId      String        @db.Uuid
+  placeId      String        @map("place_id") @db.Uuid
   place        Place         @relation(fields: [placeId], references: [id])
   appointments Appointment[]
 
-  createdAt DateTime
-  updatedAt DateTime?
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  deletedAt DateTime?
+  @@map("room")
 }
 
 model Place {
@@ -141,8 +147,9 @@ model Place {
   code  String @unique
   rooms Room[]
 
-  createdAt DateTime
-  updatedAt DateTime?
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  deletedAt DateTime?
+  @@map("place")
 }

@@ -38,6 +38,25 @@ export class UpdatePatientCommand {
   ) {}
 }
 
+export namespace UpdatePatientCommand {
+  export type Data = Partial<{
+    name: string
+    email: string
+    phone: string
+    document: string
+    birthdate: string
+    address: Partial<{
+      street: string
+      number: string
+      neighborhood: string
+      city: string
+      state: string
+      postalCode: string
+      complement?: string
+    }>
+  }>
+}
+
 export class DeletePatientCommand {
   constructor (readonly id: string) {}
 }
